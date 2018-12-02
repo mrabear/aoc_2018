@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<body>
+	  <textarea id="input" cols="40" rows="10"></textarea><br>
+	  <input type="button" onclick="solveThatShit();" value="Run Simulation"><br>
+
+      Part 1 Result: <input type = "text"  id = "part1" value = "" /><br>
+      Part 2 Result: <input type = "text"  id = "part2" value = "" /><br>
+
+      <textarea id="debug" name="Text1" cols="40" rows="5"></textarea>
+
+      <script type="text/javascript">
+      	function solveThatShit(){
+      		//List of commands
+			var commandList = new Array();
+			var twoMatch = 0;
+			var threeMatch = 0;
+			var currentInput = "";
+
+			commandList = document.getElementById("input").value.split("\n")		
+
+			// Part 1 Calculation
+			for( var commandIndex = 0 ; commandIndex < commandList.length ; commandIndex++ ){
+				currentInput = commandList[ commandIndex ];
+
+				var stringMap = {};
+
+				for( var currentIndex = 0 ; currentIndex < currentInput.length ; currentIndex++ ){
+					if( currentInput[ currentIndex ] in stringMap )
+						stringMap[ currentInput[ currentIndex ] ]++;
+					else
+						stringMap[ currentInput[ currentIndex ] ] = 1;
+
+					//document.getElementById("debug").value += stringMap[ currentInput[ currentIndex ] ];
+				}
+				//document.getElementById("debug").value += "\n--------\n";
+
+				var hasTwoMatched = false;
+				var hasThreeMatched = false;
+
+				for( var key in stringMap ){
+					if( stringMap[key] == 2 && !hasTwoMatched){
+						twoMatch++;
+						hasTwoMatched = true;
+					}
+					else if( stringMap[key] == 3 && !hasThreeMatched ){
+						threeMatch++;
+						hasThreeMatched = true;
+					}
+				}
+				//document.getElementById("debug").value += commandIndex + ":" + commandList[commandIndex] + "\n"				
+			}
+
+			document.getElementById("part1").value = twoMatch * threeMatch;
+
+			// Part 2
+			var outerInput = "";
+			var innerInput = "";
+			var resultString = "";
+
+			for( var outerIndex = 0 ; outerIndex < commandList.length ; outerIndex++ ){
+				outerInput = commandList[ outerIndex ];
+
+				for( var innerIndex = 0 ; innerIndex < commandList.length ; innerIndex++ ){
+					innerInput = commandList[ innerIndex ];
+
+					var compareScore = innerInput.length;
+					for( var compareIndex = 0 ; compareIndex < innerInput.length ; compareIndex++ ){
+						if( outerInput[ compareIndex ] == innerInput[ compareIndex ] )
+							compareScore--;
+					}
+
+					if( compareScore == 1 && resultString == "" ){
+						for( var compareIndex = 0 ; compareIndex < innerInput.length ; compareIndex++ ){
+							if( outerInput[ compareIndex ] == innerInput[ compareIndex ] )
+								resultString += outerInput[ compareIndex ];
+						}
+						
+						document.getElementById("part2").value = resultString;
+
+						//document.getElementById("debug").value += "line 1: " + outerInput + "\nline 2: " + innerInput + "\n";
+					}
+				}
+			}
+
+		}
+	</script>
+
+</body>
+</html>
