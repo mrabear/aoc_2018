@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<body>
+	  <textarea id="input" cols="40" rows="10"></textarea><br>
+	  <input type="button" onclick="solveThatShit();" value="Run Simulation"><br>
+
+      Part 1 Result: <input type = "text"  id = "part1" value = "" /><br>
+      Part 2 Result: <input type = "text"  id = "part2" value = "" /><br>
+
+      <textarea id="debug" name="Text1" cols="40" rows="5"></textarea>
+
+      <script type="text/javascript">
+      	function solveThatShit(){
+      		//List of commands
+      		//var fabricGrid = [[],[]];
+
+      		var fabricGrid = new Array( 1000 );
+
+			for( var outer = 0 ; outer < 1000 ; outer++ ){
+				fabricGrid[outer] = new Array( 1000 );
+				for( var inner = 0 ; inner < 1000 ; inner++ )
+					fabricGrid[outer][inner] = 0;
+
+			}
+
+      		//#1 @ 509,796: 18x15
+      		var claimList = new Array();
+			claimList = document.getElementById("input").value.split("\n")		
+
+			for( var currentIndex = 0 ; currentIndex < claimList.length ; currentIndex++ ){
+				var x = parseInt( claimList[currentIndex].substring( claimList[ currentIndex ].search("@") + 2, claimList[ currentIndex ].search(",")));
+				var y = parseInt( claimList[currentIndex].substring( claimList[ currentIndex ].search(",") + 1, claimList[ currentIndex ].search(":")));
+				var w = parseInt( claimList[currentIndex].substring( claimList[ currentIndex ].search(":") + 2, claimList[ currentIndex ].search("x")));
+				var h = parseInt( claimList[currentIndex].substring( claimList[ currentIndex ].search("x") + 1, claimList[ currentIndex ].length ));
+
+				for( var outer = x ; outer < x + w ; outer++ )
+					for( var inner = y ; inner < y + h ; inner++)
+							fabricGrid[outer][inner]++;
+
+			}
+
+			var totalMatch = 0;
+
+			for( var outer = 0 ; outer < fabricGrid.length ; outer++ ){
+				for( var inner = 0 ; inner < fabricGrid.length ; inner++){
+					if( fabricGrid[outer][inner] >= 2 ){
+						totalMatch++;
+					}
+				}
+			}
+
+			document.getElementById("part1").value = totalMatch;
+
+			for( var currentIndex = 0 ; currentIndex < claimList.length ; currentIndex++ ){
+				var currentClaim = claimList[currentIndex];
+				var x = parseInt( currentClaim.substring( claimList[ currentIndex ].search("@") + 2, claimList[ currentIndex ].search(",")));
+				var y = parseInt( currentClaim.substring( claimList[ currentIndex ].search(",") + 1, claimList[ currentIndex ].search(":")));
+				var w = parseInt( claimList[currentIndex].substring( claimList[ currentIndex ].search(":") + 2, claimList[ currentIndex ].search("x")));
+				var h = parseInt( claimList[currentIndex].substring( claimList[ currentIndex ].search("x") + 1, claimList[ currentIndex ].length ));
+				var claim = currentClaim.substring( 1, currentClaim.search("@") - 1);
+
+				//document.getElementById("debug").value += "claim: " + claim + " (" + x + "," + y + ") " + w + "x" + h + "\n";
+				var match = true;
+				for( var outer = x ; outer < x + w ; outer++ )
+					for( var inner = y ; inner < y + h ; inner++)
+							if( fabricGrid[outer][inner] > 1 )
+								match = false;
+
+				if( match )
+					document.getElementById("part2").value = claim;
+
+			}
+		}
+	</script>
+
+</body>
+</html>
