@@ -1140,13 +1140,12 @@
 				if( currentEntry.search("Guard") >= 0 ){
 					currentGuard = currentEntry.substring( currentEntry.search("#") + 1, currentEntry.search("begins") - 1 );
 
-					document.getElementById("debug").value += "guard: (" + currentGuard + ") ";
+					document.getElementById("debug").value += "starting new guard: (" + currentGuard + ")\n";
 
 					if( !(currentGuard in guardTotals) ){
-						document.getElementById("debug").value += " init ";
 						guardTotals[ currentGuard ] = 0;
-						guardMinutes[ currentGuard ] = new Array( 120 );
-						for( var index = 0 ; index < 120 ; index++ )
+						guardMinutes[ currentGuard ] = new Array( 60 );
+						for( var index = 0 ; index < guardMinutes[ currentGuard ].length ; index++ )
 							guardMinutes[ currentGuard ][ index ] = 0;
 					}
 				} else if( currentEntry.search("falls") >= 0 ){
@@ -1156,14 +1155,10 @@
 
 				} else if( currentEntry.search("wakes") >= 0 ){
 					guardTotals[ currentGuard ] += minute - startTime;
-					document.getElementById("debug").value += "trying ";
-
-					for( var index = startTime ; index < minute ; index++ ){
-							document.getElementById("debug").value += index + ",";
+					for( var index = startTime ; index < minute ; index++ )
 							guardMinutes[ currentGuard ][ index ]++;
-					}
 
-					document.getElementById("debug").value += "end: " + minute + " total: (" + guardTotals[ currentGuard ] + ")\n";
+					document.getElementById("debug").value += "end: " + minute + " running total: (" + guardTotals[ currentGuard ] + ")\n";
 
 					startTime = 0;
 				}
@@ -1176,16 +1171,16 @@
 					maxTime = guardTotals[ guard ];
 					maxGuard = guard;
 				}
-				document.getElementById("debug").value += "guard: " + guard + " time: " + guardTotals[ guard ] + "\n";
 			}
 
 			var maxMinuteValue = 0;
 			var maxMinute = 0;
-			for( var index = 0 ; index < guardMinutes[ maxGuard ].length ; index++ )
+			for( var index = 0 ; index < guardMinutes[ maxGuard ].length ; index++ ){
 				if( guardMinutes[ maxGuard ][ index ] > maxMinuteValue ){
 					maxMinuteValue = guardMinutes[ maxGuard ][ index ];
 					maxMinute = index;
 				}
+			}
 
 			document.getElementById("debug").value += "\n===========\nguard: " + maxGuard + " time: " + maxTime + " minute: " + maxMinute + "\n";
 			
