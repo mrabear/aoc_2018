@@ -1,7 +1,102 @@
 <!DOCTYPE html>
 <html>
-<body>
-	  <textarea id="input" cols="40" rows="10">[1518-05-27 00:42] falls asleep
+	<!-- stealing the advent of code style -->
+	<head>
+		<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:300&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="https://adventofcode.com/static/style.css?16"/>
+		<link rel="stylesheet alternate" type="text/css" href="https://adventofcode.com/static/highcontrast.css?0" title="High Contrast"/>
+	</head>
+
+	<body style="font-family: 'Source Code Pro', monospace; font-size: 14pt;">
+
+      	<script type="text/javascript">
+
+		// Solve that shit
+      	function solveThatShit(){
+      		var logEntries = new Array();
+			logEntries = document.getElementById("input").value.split("\n");
+			logEntries.sort();
+			var guardTotals = {};
+			var guardMinutes = {};
+			var currentGuard = "";
+			var startTime = 0;
+
+			document.getElementById("debug").value += "Starting Run of " + logEntries.length + " items\n=========\n";
+
+			for( var currentIndex = 0 ; currentIndex < logEntries.length ; currentIndex++ ){
+				var currentEntry = logEntries[currentIndex];
+				var minute = parseInt( currentEntry.substring( currentEntry.search(":") + 1, currentEntry.search(":") + 3));
+				var command = "";
+
+				if( currentEntry.search("Guard") >= 0 ){
+					currentGuard = currentEntry.substring( currentEntry.search("#") + 1, currentEntry.search("begins") - 1 );
+
+					document.getElementById("debug").value += "starting new guard: (" + currentGuard + ")\n";
+
+					if( !(currentGuard in guardTotals) ){
+						guardTotals[ currentGuard ] = 0;
+						guardMinutes[ currentGuard ] = new Array( 60 );
+						for( var index = 0 ; index < guardMinutes[ currentGuard ].length ; index++ )
+							guardMinutes[ currentGuard ][ index ] = 0;
+					}
+				} else if( currentEntry.search("falls") >= 0 ){
+					startTime = minute;
+
+					document.getElementById("debug").value += "start: (" + startTime + ") ";
+
+				} else if( currentEntry.search("wakes") >= 0 ){
+					guardTotals[ currentGuard ] += minute - startTime;
+					for( var index = startTime ; index < minute ; index++ )
+							guardMinutes[ currentGuard ][ index ]++;
+
+					document.getElementById("debug").value += "end: " + minute + " running total: (" + guardTotals[ currentGuard ] + ")\n";
+
+					startTime = 0;
+				}
+			}
+
+			var maxTime = 0;
+			var maxGuard = "";
+			for( var guard in guardTotals ){
+				if( guardTotals[ guard ] > maxTime){
+					maxTime = guardTotals[ guard ];
+					maxGuard = guard;
+				}
+			}
+
+			var maxMinuteValue = 0;
+			var maxMinute = 0;
+			for( var index = 0 ; index < guardMinutes[ maxGuard ].length ; index++ ){
+				if( guardMinutes[ maxGuard ][ index ] > maxMinuteValue ){
+					maxMinuteValue = guardMinutes[ maxGuard ][ index ];
+					maxMinute = index;
+				}
+			}
+
+			document.getElementById("debug").value += "\n===========\nguard: " + maxGuard + " time: " + maxTime + " minute: " + maxMinute + "\n";
+			
+			document.getElementById("part1").value = maxGuard * maxMinute;
+
+			maxMinuteValue = 0;
+			maxMinute = 0;
+			maxGuard = "";
+			for( var currentGuard in guardMinutes )
+				for( var index = 0 ; index < guardMinutes[ currentGuard ].length ; index++ )
+					if( guardMinutes[ currentGuard ][ index ] > maxMinuteValue ){
+						maxMinuteValue = guardMinutes[ currentGuard ][ index ];
+						maxMinute = index;
+						maxGuard = currentGuard;
+					}
+
+			document.getElementById("part2").value = maxGuard * maxMinute;
+		}
+
+		</script>
+
+		<h1 style="color: #00cc00;">Advent of Code: Day 4 Submission <a href="https://adventofcode.com/2018/day/4" target="_blank">(Challenge Description)</a></h1>
+
+		<font style="color: #00cc00;">Input:</font><br>
+		<textarea id="input" cols="80" rows="10" style="font-size: 16px;">[1518-05-27 00:42] falls asleep
 [1518-07-14 00:53] falls asleep
 [1518-09-22 00:10] falls asleep
 [1518-10-27 00:55] wakes up
@@ -1110,96 +1205,16 @@
 [1518-07-27 23:47] Guard #2617 begins shift
 [1518-02-23 00:22] falls asleep
 [1518-04-26 00:01] falls asleep
-[1518-04-07 00:59] wakes up</textarea><br>
-	  <input type="button" onclick="solveThatShit();" value="Run Simulation"><br>
+[1518-04-07 00:59] wakes up</textarea><br><br>
 
-      Part 1 Result: <input type = "text"  id = "part1" value = "" /><br>
-      Part 2 Result: <input type = "text"  id = "part2" value = "" /><br>
+		<input type="button" onclick="solveThatShit();" value="[ Run Simulation ]"  style="background: transparent; border: 0; font-family: inherit; font-size: 26px; margin: 0; padding: 0; color: #009900; cursor: pointer;"><br>
 
-      <textarea id="debug" name="Text1" cols="80" rows="20"></textarea>
+		<p style="color: #00cc00;">
+		    Part 1 Result: <input type = "text"  id = "part1" value = "" size=55/><br>
+		    Part 2 Result: <input type = "text"  id = "part2" value = "" size=55/><br>
+		</p>
 
-      <script type="text/javascript">
-      	function solveThatShit(){
-      		var logEntries = new Array();
-			logEntries = document.getElementById("input").value.split("\n")
-			logEntries.sort();
-			var guardTotals = {};
-			var guardMinutes = {};
-			var currentGuard = "";
-			var startTime = 0;
-
-			document.getElementById("debug").value += "Starting Run of " + logEntries.length + " items\n=========\n";
-
-			for( var currentIndex = 0 ; currentIndex < logEntries.length ; currentIndex++ ){
-				var currentEntry = logEntries[currentIndex];
-				var minute = parseInt( currentEntry.substring( currentEntry.search(":") + 1, currentEntry.search(":") + 3));
-				var command = "";
-
-				//document.getElementById("debug").value += "minute: (" + minute + ") ";
-
-				if( currentEntry.search("Guard") >= 0 ){
-					currentGuard = currentEntry.substring( currentEntry.search("#") + 1, currentEntry.search("begins") - 1 );
-
-					document.getElementById("debug").value += "starting new guard: (" + currentGuard + ")\n";
-
-					if( !(currentGuard in guardTotals) ){
-						guardTotals[ currentGuard ] = 0;
-						guardMinutes[ currentGuard ] = new Array( 60 );
-						for( var index = 0 ; index < guardMinutes[ currentGuard ].length ; index++ )
-							guardMinutes[ currentGuard ][ index ] = 0;
-					}
-				} else if( currentEntry.search("falls") >= 0 ){
-					startTime = minute;
-
-					document.getElementById("debug").value += "start: (" + startTime + ") ";
-
-				} else if( currentEntry.search("wakes") >= 0 ){
-					guardTotals[ currentGuard ] += minute - startTime;
-					for( var index = startTime ; index < minute ; index++ )
-							guardMinutes[ currentGuard ][ index ]++;
-
-					document.getElementById("debug").value += "end: " + minute + " running total: (" + guardTotals[ currentGuard ] + ")\n";
-
-					startTime = 0;
-				}
-			}
-
-			var maxTime = 0;
-			var maxGuard = "";
-			for( var guard in guardTotals ){
-				if( guardTotals[ guard ] > maxTime){
-					maxTime = guardTotals[ guard ];
-					maxGuard = guard;
-				}
-			}
-
-			var maxMinuteValue = 0;
-			var maxMinute = 0;
-			for( var index = 0 ; index < guardMinutes[ maxGuard ].length ; index++ ){
-				if( guardMinutes[ maxGuard ][ index ] > maxMinuteValue ){
-					maxMinuteValue = guardMinutes[ maxGuard ][ index ];
-					maxMinute = index;
-				}
-			}
-
-			document.getElementById("debug").value += "\n===========\nguard: " + maxGuard + " time: " + maxTime + " minute: " + maxMinute + "\n";
-			
-			document.getElementById("part1").value = maxGuard * maxMinute;
-
-			maxMinuteValue = 0;
-			maxMinute = 0;
-			maxGuard = "";
-			for( var currentGuard in guardMinutes )
-				for( var index = 0 ; index < guardMinutes[ currentGuard ].length ; index++ )
-					if( guardMinutes[ currentGuard ][ index ] > maxMinuteValue ){
-						maxMinuteValue = guardMinutes[ currentGuard ][ index ];
-						maxMinute = index;
-						maxGuard = currentGuard;
-					}
-
-			document.getElementById("part2").value = maxGuard * maxMinute;
-		}
-	</script>
-
-</body>
+	    <font style="color: #00cc00;">Debug Output:</font><br>
+	    <textarea id="debug" name="Text1" cols="80" rows="20" style="font-size: 16px;"></textarea>
+	</body>
 </html>
