@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+	<!-- stealing the advent of code style -->
+	<head>
+		<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:300&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="https://adventofcode.com/static/style.css?16"/>
+		<link rel="stylesheet alternate" type="text/css" href="https://adventofcode.com/static/highcontrast.css?0" title="High Contrast"/>
+	</head>
+
+	<body style="font-family: 'Source Code Pro', monospace; font-size: 14pt; min-width: 0px;">
+
+      	<script type="text/javascript">
+
+		// Solve that shit
+      	function solveThatShit(){
+      		var startTime = new Date();
+      		var input = new Array();
+			input = document.getElementById("input").value.split("\n");
+
+			var gridSize = 400;
+			var distanceCheck = 10000;
+     		var closestPoint = "";
+			var totalDistance = 0;
+			var distanceArea = 0;
+     		var grid = new Array( gridSize );
+
+			document.getElementById("debug").value = "Starting Run (" + input.length + " lines of input)\n==============================\n";
+
+     		// Build initial distance grid
+			for( var outer = 0 ; outer < grid.length ; outer++ ){
+				grid[outer] = new Array( grid.length );
+				for( var inner = 0 ; inner < grid.length ; inner++ ){
+					grid[outer][inner] = {};
+					for( var point = 0 ; point < input.length ; point++ )
+						grid[outer][inner][input[point]] = getDistance( outer, inner, getX( input[point] ), getY( input[point] ) );
+				}
+			}
+
+     		// Determine closest owner
+			for( var inner = 0 ; inner < grid.length ; inner++ ){
+				for( var outer = 0 ; outer < grid.length ; outer++ ){
+		     		closestPoint = "";
+		     		closestDistance = grid.length;
+		     		totalDistance = 0;
+
+		     		// Find closest point
+					for( var point = 0 ; point < input.length ; point++ ){
+						totalDistance += grid[outer][inner][input[point]];
+
+						if( grid[outer][inner][input[point]] == closestDistance ){
+							closestPoint = "";
+				     		closestDistance = grid[outer][inner][input[point]];
+						} else if( grid[outer][inner][input[point]] < closestDistance ){
+				     		closestPoint = input[point];
+				     		closestDistance = grid[outer][inner][input[point]];
+						}
+					}
+
+					grid[outer][inner] = closestPoint;
+
+					if( totalDistance < distanceCheck )
+						distanceArea++;
+				}
+			}
+
+			// Filter out infinites
+			var candidates = {};
+			var infinite = false;
+			for( var point = 0 ; point < input.length ; point++ ){
+				for( var i = 0 ; i < grid.length ; i++ ){
+					if( ( grid[i][0] == input[point]  ) || 
+						( grid[0][i] == input[point]  ) || 
+						( grid[i][grid.length-1] == input[point]  ) || 
+						( grid[grid.length-1][i] == input[point]  ) )
+						infinite = true;
+				}
+
+				if( !infinite )
+					candidates[input[point]] = 0;
+
+				infinite = false;
+			}
+
+			// Add up area of remaining
+			for( var point in candidates ){
+				for( var outer = 0 ; outer < grid.length ; outer++ ){
+					for( var inner = 0 ; inner < grid.length ; inner++ ){
+						if( grid[outer][inner] == point ){
+							candidates[point]++;
+						}
+					}
+				}
+			}
+
+			// Find largest plot
+			var maxArea = 0;
+			for( var point in candidates)
+				if( candidates[point] > maxArea )
+					maxArea = candidates[point];
+
+			document.getElementById("part1").value = maxArea;
+			document.getElementById("part2").value = distanceArea;
+
+			document.getElementById("debug").value += "\n==============================\nRun Completed in " +  ((new Date() - startTime) / 1000 ).toFixed(2)  + " seconds\n";
+		}
+
+		function getDistance( x1, y1, x2, y2 ){
+			return ( Math.abs( x1 - x2 ) + Math.abs( y1 - y2 ) );
+		}
+
+		function getX( input ){
+			return( input.slice( 0, input.search(",") ) ); 
+		}
+
+		function getY( input ){
+			return( input.slice( input.search(" "), input.length ) ); 
+		}
+
+		</script>
+		<div align="center">
+
+			<!---- UPDATE SUBMISSION DAY HERE -->
+			<!-- Page Title -->
+			<h1 style="color: #00cc00;">Advent of Code: Day 6 Submission ( <a href="https://adventofcode.com/2018/day/6" target="_blank">Overview</a> | <a href="https://github.com/mrabear" target="_blank">Github</a> )</h1>
+
+			<!-- COPY/PASTE SOURCE INPUT HERE -->
+			<!-- Input Box -->
+			<font style="color: #00cc00;">Input:</font><br>
+<textarea id="input" cols="80" rows="10" style="font-size: 16px; border:solid 1px #00cc00;">353, 177
+233, 332
+178, 231
+351, 221
+309, 151
+105, 289
+91, 236
+321, 206
+156, 146
+94, 82
+81, 114
+182, 122
+81, 153
+319, 312
+334, 212
+275, 93
+224, 355
+347, 94
+209, 65
+118, 172
+113, 122
+182, 320
+191, 178
+99, 70
+260, 184
+266, 119
+177, 178
+313, 209
+61, 285
+155, 218
+354, 198
+274, 53
+225, 138
+228, 342
+187, 165
+226, 262
+143, 150
+124, 159
+325, 210
+163, 176
+326, 91
+170, 193
+84, 265
+199, 248
+107, 356
+45, 340
+277, 173
+286, 44
+242, 150
+120, 230</textarea><br><br>
+
+			<!-- The 'run simulation' button and result fields -->
+			<div style="display: inline-block;  border: 1px solid #00cc00; padding: 10px; margin-left: 10px;">
+				<input type="button" onclick="solveThatShit();" value="[ Run Simulation ]"  style="background: transparent; border: 0; font-family: inherit; font-size: 26px; margin: 0; padding: 0; color: #009900; cursor: pointer;"><br>
+
+				<p style="color: #00cc00;">
+				    Part 1 Result: <input type = "text"  id = "part1" value = "" size=46/><input type="button" onclick="document.getElementById('part1').select();document.execCommand('copy');window.getSelection().removeAllRanges();" value="[ Copy ]"  style="background: transparent; border: 0; font-family: inherit; font-size: 16px; margin: 0; padding: 0; color: #009900; cursor: pointer;"><br>
+				    Part 2 Result: <input type = "text"  id = "part2" value = "" size=46/><input type="button" onclick="document.getElementById('part2').select();document.execCommand('copy');window.getSelection().removeAllRanges();" value="[ Copy ]"  style="background: transparent; border: 0; font-family: inherit; font-size: 16px; margin: 0; padding: 0; color: #009900; cursor: pointer;"><br>
+				</p>
+			</div>
+
+			<!-- Debug Output Box -->
+			<br><br>
+
+		    <font style="color: #00cc00;">Debug Output:</font><br>
+
+		    <textarea id="debug" name="Text1" cols="80" rows="15" style="font-size: 16px; border:solid 1px #00cc00;"></textarea>
+		</div>
+	</body>
+</html>
