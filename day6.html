@@ -9,24 +9,24 @@
 
 	<body style="font-family: 'Source Code Pro', monospace; font-size: 14pt; min-width: 0px;">
 
-      	<script type="text/javascript">
+		<script type="text/javascript">
 
 		// Solve that shit
-      	function solveThatShit(){
-      		var startTime = new Date();
-      		var input = new Array();
+		function solveThatShit(){
+			var startTime = new Date();
+			var input = new Array();
 			input = document.getElementById("input").value.split("\n");
 
 			var gridSize = 400;
 			var distanceCheck = 10000;
-     		var closestPoint = "";
+			var closestPoint = "";
 			var totalDistance = 0;
 			var distanceArea = 0;
-     		var grid = new Array( gridSize );
+			var grid = new Array( gridSize );
 
 			document.getElementById("debug").value = "Starting Run (" + input.length + " lines of input)\n==============================\n";
 
-     		// Build initial distance grid
+			// Build initial distance grid
 			for( var outer = 0 ; outer < grid.length ; outer++ ){
 				grid[outer] = new Array( grid.length );
 				for( var inner = 0 ; inner < grid.length ; inner++ ){
@@ -36,23 +36,23 @@
 				}
 			}
 
-     		// Determine closest owner
+			// Determine closest owner
 			for( var inner = 0 ; inner < grid.length ; inner++ ){
 				for( var outer = 0 ; outer < grid.length ; outer++ ){
-		     		closestPoint = "";
-		     		closestDistance = grid.length;
-		     		totalDistance = 0;
+					closestPoint = "";
+					closestDistance = grid.length;
+					totalDistance = 0;
 
-		     		// Find closest point
+					// Find closest point
 					for( var point = 0 ; point < input.length ; point++ ){
 						totalDistance += grid[outer][inner][input[point]];
 
 						if( grid[outer][inner][input[point]] == closestDistance ){
 							closestPoint = "";
-				     		closestDistance = grid[outer][inner][input[point]];
+							closestDistance = grid[outer][inner][input[point]];
 						} else if( grid[outer][inner][input[point]] < closestDistance ){
-				     		closestPoint = input[point];
-				     		closestDistance = grid[outer][inner][input[point]];
+							closestPoint = input[point];
+							closestDistance = grid[outer][inner][input[point]];
 						}
 					}
 
