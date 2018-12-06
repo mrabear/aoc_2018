@@ -19,9 +19,6 @@
 
 			var gridSize = 400;
 			var distanceCheck = 10000;
-			var closestPoint = "";
-			var totalDistance = 0;
-			var distanceArea = 0;
 			var grid = new Array( gridSize );
 
 			document.getElementById("debug").value = "Starting Run (" + input.length + " lines of input)\n==============================\n";
@@ -36,7 +33,11 @@
 				}
 			}
 
-			// Determine closest owner
+			// Determine closest owner and see if point falls within part 2 check
+			var closestPoint = "";
+			var totalDistance = 0;
+			var distanceArea = 0;
+
 			for( var inner = 0 ; inner < grid.length ; inner++ ){
 				for( var outer = 0 ; outer < grid.length ; outer++ ){
 					closestPoint = "";
