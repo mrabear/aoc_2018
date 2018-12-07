@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+	<!-- stealing the advent of code style -->
+	<head>
+		<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:300&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="https://adventofcode.com/static/style.css?16"/>
+		<link rel="stylesheet alternate" type="text/css" href="https://adventofcode.com/static/highcontrast.css?0" title="High Contrast"/>
+	</head>
+
+	<body style="font-family: 'Source Code Pro', monospace; font-size: 14pt; min-width: 0px;">
+
+      	<script type="text/javascript">
+
+		// Solve that shit
+      	function solveThatShit(){
+      		var startTime = new Date();
+      		var input = new Array();
+			input = document.getElementById("input").value.split("\n");
+
+			document.getElementById("debug").value = "Starting Run (" + input.length + " lines of input)\n==============================\n";
+
+			var reqs = {};
+			var deps = {};
+			var seq = new Array();
+			var NUM_STEPS = 26;
+
+			// Initialize the reqs
+			for( var letter = 0 ; letter < NUM_STEPS ; letter++ ){
+				reqs[ String.fromCharCode(97 + letter).toUpperCase() ] = {};
+				deps[ String.fromCharCode(97 + letter).toUpperCase() ] = {};
+			}
+
+			for( var step = 0 ; step < input.length ; step++ ){
+				var line = input[step];
+				//document.getElementById("debug").value += req.charAt( 5 ) + "<=" + req.charAt( 36 ) + "\n";
+				reqs[ line.charAt( 36 ) ][ line.charAt( 5 ) ] = false;
+				deps[ line.charAt( 5 ) ][ line.charAt( 36 ) ] = false;
+			}
+
+			document.getElementById("debug").value += "Here are the reqs:\n";
+			for( var letter in reqs ){
+				document.getElementById("debug").value += "(" + letter + ") (";
+				for( var depend in reqs[letter] ){
+					document.getElementById("debug").value += depend;
+				}
+				document.getElementById("debug").value += ")\n";
+			}
+
+			document.getElementById("debug").value += "Here are the dependancies:\n";
+			for( var letter in deps ){
+				document.getElementById("debug").value += "(" + letter + ") (";
+				for( var depend in deps[letter] ){
+					document.getElementById("debug").value += depend;
+				}
+				document.getElementById("debug").value += ")\n";
+			}
+
+
+			var reqsLength = Object.keys(reqs).length;
+			var completed = "";
+			var lastLetter = "";
+			//for( var step = 0 ; step < reqsLength ; step++ ){
+
+			//document.getElementById("debug").value += "Done building lists reqs(" + reqsLength + ")\n";
+
+			var limit = NUM_STEPS;
+			while( completed.length < reqsLength && limit > 0 ){
+				//document.getElementById("debug").value += "Starting Next Step (" + completed + ")\n";
+
+				var found = false;
+				var candidates = new Array();
+
+				for( var letter in reqs ){
+					//document.getElementById("debug").value += "(" + letter + ") ";
+
+					if( !completed.includes( letter ) && !found ){
+						if( lastLetter == "" ){
+							//document.getElementById("debug").value += "(first) ";
+
+							if( Object.keys(reqs[letter]).length == 0 ){
+								found = true;
+								candidates.push( letter );
+							}
+						} else {
+							//document.getElementById("debug").value += "(";
+
+							var test = true;
+							for( var depend in reqs[letter] ){
+								//document.getElementById("debug").value += depend;
+
+								if( depend == lastLetter ){
+									reqs[letter][depend] = true;
+								}
+
+								test = test && reqs[letter][depend];
+							}
+							//document.getElementById("debug").value += ") ";
+
+							if( test )
+								candidates.push( letter );
+						}
+
+						//if( found )
+						//	document.getElementById("debug").value += "(match!) ";
+					}/* else {
+						document.getElementById("debug").value += "(ignored) ";
+					}*/
+
+					//document.getElementById("debug").value += "(done)\n";
+				}
+
+				if( candidates.length > 0 ){
+					candidates = candidates.sort()
+					seq.push( candidates );
+					completed += candidates[0];
+					lastLetter = candidates[0];
+				}
+
+				limit--;
+			}
+
+			/*document.getElementById("debug").value += "Sequence:\n";			
+			for( var i = 0 ; i < seq.length ; i++ ){
+				document.getElementById("debug").value += i + ": (" + seq[i] + ")\n";
+			}*/
+
+			var workers = new Array(5);
+			var jobs = new Array(5);
+
+			for( var i = 0 ; i < workers.length ; i++ ){
+				workers[i] = 0;
+				jobs[i] = "";
+			}
+
+			var completedJobs = "";
+			var time = 0;
+
+			// assign first job
+			//workers[0] = score( completed[0] );
+			//jobs[0] = completed[0];
+
+			var tester="ABC";
+			//document.getElementById("debug").value += tester.charCodeAt(0) + " / " + tester.charCodeAt(1) + " / " + tester.charCodeAt(2) + "\n" ;
+
+			while(( completedJobs.length < completed.length ) && ( time < 1200 )){
+
+				//document.getElementById("debug").value += time + ": (" + completed + ") (" + completedJobs + ") ";
+
+				var availableWorker = new Array();
+				var availableJobs = new Array();
+
+				document.getElementById("debug").value += time.toString().padEnd( 3 ) + ": ";
+				for( var i = 0 ; i < workers.length ; i++ ){
+					document.getElementById("debug").value += "(" + i + " " +  jobs[i].toString().padEnd( 2 ) + " " + workers[i].toString().padEnd( 2 ) + ") ";
+
+					if( workers[i] == 0 ){
+						availableWorker.push(i);
+						completedJobs += jobs[i];
+						jobs[i] = "";
+					} else {
+						workers[i]--;
+					}
+				}
+
+				if( availableWorker.length > 0 ){
+					//document.getElementById("debug").value += "\nPotential Jobs: (";
+					for( var i = 0 ; i < completedJobs.length ; i++ ){
+						for( var potential in deps[completedJobs[i]] )
+							if( !completedJobs.includes(potential) && !availableJobs.includes(potential)){
+								var validJob = true;
+								for( var j = 0 ; j < jobs.length ; j++ ){
+									if( jobs[j] == potential )
+										validJob = false;
+								}
+
+								for( var j in reqs[potential] ){
+									if( !completedJobs.includes( j ))
+										validJob = false;
+								}
+
+							    if( validJob )
+									availableJobs.push( potential );
+								//document.getElementById("debug").value += potential;
+							}
+
+					}
+
+					for( var potential in reqs ){
+						if( Object.keys(reqs[potential]).length == 0 && !completedJobs.includes(potential) ){
+							var validJob = true;
+							for( var j = 0 ; j < jobs.length ; j++ )
+								if( jobs[j] == potential )
+									validJob = false;
+
+						    if( validJob ){
+								availableJobs.push( potential );
+								document.getElementById("debug").value += " !" + potential + "! ";
+						    }
+						}
+					}
+
+					//document.getElementById("debug").value += ")";
+
+					//document.getElementById("debug").value += " (work " + availableWorker.length + ") (job " + availableJobs.length + ") ";
+
+					availableJobs = availableJobs.sort();
+					document.getElementById("debug").value += " (AVAIL: ";
+					for( var i = 0 ; i < availableJobs.length ; i++ ){
+						document.getElementById("debug").value += availableJobs[i];
+					}					
+					document.getElementById("debug").value += ") ";
+
+					for( var i = 0 ; i < availableWorker.length && availableJobs.length > 0; i++ ){
+						var job = availableJobs.shift();
+						workers[availableWorker[i]] = score( job );
+						jobs[availableWorker[i]] = job;
+						document.getElementById("debug").value += " (" + job + " => " + availableWorker[i] + ") ";
+					}
+				}
+
+				document.getElementById("debug").value += " (DONE: " + completedJobs + ")\n";
+
+				time++;
+			}
+
+			// INSERT PART 1 SOLUTION HERE
+
+			document.getElementById("part1").value = completed;
+
+			// INSERT PART 2 SOLUTION HERE
+
+			document.getElementById("part2").value = time - 1;
+
+			document.getElementById("debug").value += "\n==============================\nRun Completed in " +  ((new Date() - startTime) / 1000 ).toFixed(2)  + " seconds\n";
+		}
+
+		function score( letter ){
+			return( letter.charCodeAt(0) - 5 );
+		}
+
+		</script>
+		<div align="center">
+
+			<!---- UPDATE SUBMISSION DAY HERE -->
+			<!-- Page Title -->
+			<h1 style="color: #00cc00;">Advent of Code: Day 7 Submission ( <a href="https://adventofcode.com/2018/day/7" target="_blank">Overview</a> | <a href="https://github.com/mrabear" target="_blank">Github</a> )</h1>
+
+			<!-- COPY/PASTE SOURCE INPUT HERE -->
+			<!-- Input Box -->
+			<font style="color: #00cc00;">Input:</font><br>
+			<textarea id="input" cols="80" rows="10" style="font-size: 16px; border:solid 1px #00cc00;">Step J must be finished before step K can begin.
+Step N must be finished before step X can begin.
+Step S must be finished before step G can begin.
+Step T must be finished before step R can begin.
+Step H must be finished before step L can begin.
+Step V must be finished before step W can begin.
+Step G must be finished before step U can begin.
+Step K must be finished before step A can begin.
+Step D must be finished before step Z can begin.
+Step C must be finished before step E can begin.
+Step X must be finished before step P can begin.
+Step Y must be finished before step U can begin.
+Step R must be finished before step O can begin.
+Step W must be finished before step U can begin.
+Step O must be finished before step Q can begin.
+Step A must be finished before step P can begin.
+Step B must be finished before step E can begin.
+Step F must be finished before step E can begin.
+Step Q must be finished before step U can begin.
+Step M must be finished before step E can begin.
+Step P must be finished before step U can begin.
+Step L must be finished before step Z can begin.
+Step Z must be finished before step U can begin.
+Step U must be finished before step E can begin.
+Step I must be finished before step E can begin.
+Step H must be finished before step G can begin.
+Step X must be finished before step I can begin.
+Step K must be finished before step X can begin.
+Step Z must be finished before step I can begin.
+Step S must be finished before step M can begin.
+Step L must be finished before step U can begin.
+Step A must be finished before step M can begin.
+Step W must be finished before step A can begin.
+Step N must be finished before step A can begin.
+Step S must be finished before step E can begin.
+Step W must be finished before step Q can begin.
+Step J must be finished before step L can begin.
+Step Q must be finished before step L can begin.
+Step M must be finished before step U can begin.
+Step H must be finished before step E can begin.
+Step D must be finished before step E can begin.
+Step V must be finished before step P can begin.
+Step Q must be finished before step M can begin.
+Step X must be finished before step W can begin.
+Step K must be finished before step I can begin.
+Step T must be finished before step H can begin.
+Step Y must be finished before step L can begin.
+Step G must be finished before step O can begin.
+Step M must be finished before step Z can begin.
+Step F must be finished before step Z can begin.
+Step Q must be finished before step E can begin.
+Step H must be finished before step C can begin.
+Step Q must be finished before step P can begin.
+Step D must be finished before step U can begin.
+Step Z must be finished before step E can begin.
+Step O must be finished before step M can begin.
+Step L must be finished before step I can begin.
+Step J must be finished before step A can begin.
+Step Q must be finished before step Z can begin.
+Step P must be finished before step I can begin.
+Step K must be finished before step O can begin.
+Step R must be finished before step E can begin.
+Step W must be finished before step F can begin.
+Step D must be finished before step Q can begin.
+Step R must be finished before step U can begin.
+Step W must be finished before step P can begin.
+Step S must be finished before step Z can begin.
+Step T must be finished before step P can begin.
+Step B must be finished before step Q can begin.
+Step S must be finished before step T can begin.
+Step R must be finished before step A can begin.
+Step K must be finished before step R can begin.
+Step N must be finished before step G can begin.
+Step C must be finished before step W can begin.
+Step T must be finished before step A can begin.
+Step B must be finished before step Z can begin.
+Step C must be finished before step P can begin.
+Step D must be finished before step P can begin.
+Step B must be finished before step P can begin.
+Step F must be finished before step U can begin.
+Step V must be finished before step X can begin.
+Step K must be finished before step W can begin.
+Step Y must be finished before step I can begin.
+Step C must be finished before step B can begin.
+Step X must be finished before step L can begin.
+Step X must be finished before step M can begin.
+Step H must be finished before step P can begin.
+Step S must be finished before step F can begin.
+Step J must be finished before step Y can begin.
+Step Y must be finished before step Z can begin.
+Step B must be finished before step I can begin.
+Step S must be finished before step C can begin.
+Step K must be finished before step E can begin.
+Step N must be finished before step Q can begin.
+Step A must be finished before step Z can begin.
+Step J must be finished before step I can begin.
+Step Y must be finished before step O can begin.
+Step Y must be finished before step F can begin.
+Step S must be finished before step U can begin.
+Step D must be finished before step W can begin.
+Step V must be finished before step D can begin.</textarea><br><br>
+
+			<!-- The 'run simulation' button and result fields -->
+			<div style="display: inline-block;  border: 1px solid #00cc00; padding: 10px; margin-left: 10px;">
+				<input type="button" onclick="solveThatShit();" value="[ Run Simulation ]"  style="background: transparent; border: 0; font-family: inherit; font-size: 26px; margin: 0; padding: 0; color: #009900; cursor: pointer;"><br>
+
+				<p style="color: #00cc00;">
+				    Part 1 Result: <input type = "text"  id = "part1" value = "" size=46/><input type="button" onclick="document.getElementById('part1').select();document.execCommand('copy');window.getSelection().removeAllRanges();" value="[ Copy ]"  style="background: transparent; border: 0; font-family: inherit; font-size: 16px; margin: 0; padding: 0; color: #009900; cursor: pointer;"><br>
+				    Part 2 Result: <input type = "text"  id = "part2" value = "" size=46/><input type="button" onclick="document.getElementById('part2').select();document.execCommand('copy');window.getSelection().removeAllRanges();" value="[ Copy ]"  style="background: transparent; border: 0; font-family: inherit; font-size: 16px; margin: 0; padding: 0; color: #009900; cursor: pointer;"><br>
+				</p>
+			</div>
+
+			<!-- Debug Output Box -->
+			<br><br>
+
+		    <font style="color: #00cc00;">Debug Output:</font><br>
+
+		    <textarea id="debug" name="Text1" cols="130" rows="15" style="font-size: 16px; border:solid 1px #00cc00;"></textarea>
+		</div>
+	</body>
+</html>
